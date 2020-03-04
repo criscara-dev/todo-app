@@ -6,6 +6,9 @@ let mongodb = require("mongodb");
 let port = 3000;
 let app = express();
 let db;
+
+// To make available in our server this file and files in it.
+app.use(express.static("public"));
 let connectionString =
   "mongodb+srv://todoAppUser:pS1itlXXFIigEv79@cluster0-hwztk.mongodb.net/TodoApp?retryWrites=true&w=majority";
 mongodb.connect(
@@ -18,7 +21,9 @@ mongodb.connect(
   }
 );
 
-// Configure the Express framework to include a body object into the requested object
+// tell express and do the same thing for async requests
+app.use(express.json());
+// Configure the Express framework to automatically take submitted form data and add it to a body object that live into the requested object
 app.use(express.urlencoded({ extended: false }));
 
 app.get("/", (req, res) => {
@@ -64,20 +69,28 @@ app.get("/", (req, res) => {
     </ul>
     
   </div>
-  
+
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="/browser.js"></script>
 </body>
 </html>
   `);
     });
 });
 
+// /create-item is from the <form> and 'item' in { text: req.body.item } is the 'name' of the input form
 app.post("/create-item", (req, res) => {
   db.collection("items").insertOne({ text: req.body.item }, () => {
     // res.send("Thanks you for subimitting the form");
     res.redirect("/");
   });
 });
-
+// message for Wanderers on this page
 app.get("/create-item", (req, res) => {
   res.send("Sorry! There is nothing here. :(");
+});
+
+app.post("/update-item", (req, res) => {
+  console.log(req.body.text);
+  res.send("Success");
 });
