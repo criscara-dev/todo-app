@@ -7,7 +7,7 @@ let port = 3000;
 let app = express();
 let db;
 
-// To make available in our server this file and files in it.
+// To make available in our server this file and files contained in it.
 app.use(express.static("public"));
 let connectionString =
   "mongodb+srv://todoAppUser:pS1itlXXFIigEv79@cluster0-hwztk.mongodb.net/TodoApp?retryWrites=true&w=majority";
@@ -21,7 +21,7 @@ mongodb.connect(
   }
 );
 
-// tell express and do the same thing for async requests
+// Tell express to get async request and add it to a body object that live into the requested object
 app.use(express.json());
 // Configure the Express framework to automatically take submitted form data and add it to a body object that live into the requested object
 app.use(express.urlencoded({ extended: false }));
@@ -38,7 +38,7 @@ app.get("/", (req, res) => {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simple To-Do App!!!</title>
+  <title>Simple To-Do App</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 </head>
 <body>
@@ -60,7 +60,7 @@ app.get("/", (req, res) => {
           return `<li class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
           <span class="item-text">${item.text}</span>
           <div>
-            <button class="edit-me btn btn-secondary btn-sm mr-1">Edit</button>
+            <button data-id="${item._id}" class="edit-me btn btn-secondary btn-sm mr-1">Edit</button>
             <button class="delete-me btn btn-danger btn-sm">Delete</button>
           </div>
           </li>`;
@@ -91,6 +91,14 @@ app.get("/create-item", (req, res) => {
 });
 
 app.post("/update-item", (req, res) => {
-  console.log(req.body.text);
-  res.send("Success");
+  // console.log(req.body.text);
+  // res.send("Success");
+  db.collection("items").findOneAndUpdate(
+    // data from the button with html >Edit< ... and from HTML5 feature attribute data-
+    { _id: new mongodb.ObjectId(req.body.id) },
+    { $set: { text: req.body.text } },
+    () => {
+      res.send("success");
+    }
+  );
 });
