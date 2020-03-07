@@ -29,8 +29,8 @@ app.use(express.urlencoded({ extended: false }));
 
 let passwordProtected = (req, res, next) => {
   res.set("WWW-Authenticate", "Basic realm='To-do App'");
-  // console.log("req.headers.authorization:", req.headers.authorization);
-  if (req.headers.authorization == "Basic Y3JpczpqYXZhc2NyaXB0") {
+  console.log("req.headers.authorization:", req.headers.authorization);
+  if (req.headers.authorization == "Basic Y3JpczpqYXZhc2NyaXB0dG9kb2FwcA==") {
     next();
   } else {
     res.status(401).send("Authentication required");
@@ -96,10 +96,6 @@ app.post("/create-item", (req, res) => {
   db.collection("items").insertOne({ text: safeText }, (err, info) => {
     res.json(info.ops[0]);
   });
-});
-// message for Wanderers on this page
-app.get("/create-item", (req, res) => {
-  res.send("Sorry! There is nothing here. :(");
 });
 
 app.post("/update-item", (req, res) => {
