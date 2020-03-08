@@ -6,7 +6,7 @@ let itemTemplate = item => `<li class="list-group-item list-group-item-action d-
 </div>
 </li>`;
 
-// Initial page load render
+// Initial Page Load Render
 let ourHTML = items.map(item => itemTemplate(item)).join("");
 document.getElementById("item-list").insertAdjacentHTML("beforeend", ourHTML);
 
@@ -20,7 +20,7 @@ document.getElementById("create-form").addEventListener("submit", e => {
       // create the html for a new item
       document
         .getElementById("item-list")
-        .insertAdjacentHTML("beforeend", itemTemplate(response.data));
+        .insertAdjacentHTML("beforeend", itemTemplate(response.data)); // res.json(info.ops[0]); from the server.js§§§§
       createField.value = "";
       createField.focus();
     })
@@ -33,7 +33,7 @@ document.addEventListener("click", e => {
   // Update feature
   if (e.target.classList.contains("edit-me")) {
     let userInput = prompt(
-      `enter your desired new text`,
+      `Enter your desired new text`,
       e.target.parentElement.parentElement.querySelector(".item-text").innerHTML
     );
     // console.log(userInput);
@@ -45,7 +45,6 @@ document.addEventListener("click", e => {
           id: e.target.getAttribute("data-id")
         })
         .then(() => {
-          // do something here
           e.target.parentElement.parentElement.querySelector(
             ".item-text"
           ).innerHTML = userInput;
@@ -63,7 +62,6 @@ document.addEventListener("click", e => {
           id: e.target.getAttribute("data-id")
         })
         .then(() => {
-          // do something here
           e.target.parentElement.parentElement.remove();
         })
         .catch(err => {

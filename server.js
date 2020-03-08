@@ -8,7 +8,7 @@ let port = 3000;
 let app = express();
 let db;
 
-// To make available in our server this file and files contained in it.
+// To make available in our server thc content of this file
 app.use(express.static("public"));
 let connectionString =
   "mongodb+srv://todoAppUser:pS1itlXXFIigEv79@cluster0-hwztk.mongodb.net/TodoApp?retryWrites=true&w=majority";
@@ -16,20 +16,22 @@ mongodb.connect(
   connectionString,
   { useNewUrlParser: true, useUnifiedTopology: true },
   (err, client) => {
-    // select the MongoDb database
+    // select the MongoDB database
+    // .db() is a method into the mongodb Object package
     db = client.db();
     app.listen(port);
   }
 );
 
-// Tell express to get async request and add it to a body object that live into the requested object
+// Tell express to get async request and add it to a body object that live into the requested object: basically fetch data 'on th fly'    without refresh the browser
 app.use(express.json());
+// Boilerplate code that let Express access user input from the req.body OBJECT
 // Configure the Express framework to automatically take submitted form data and add it to a body object that live into the requested object
 app.use(express.urlencoded({ extended: false }));
 
 let passwordProtected = (req, res, next) => {
   res.set("WWW-Authenticate", "Basic realm='To-do App'");
-  console.log("req.headers.authorization:", req.headers.authorization);
+  // console.log("req.headers.authorization:", req.headers.authorization);
   if (req.headers.authorization == "Basic Y3JpczpqYXZhc2NyaXB0dG9kb2FwcA==") {
     next();
   } else {
@@ -44,7 +46,9 @@ app.use(passwordProtected);
 app.get("/", (req, res) => {
   // load the data from the database before send back a response
   db.collection("items")
+    // .find() to get all the data back
     .find()
+    // .toArray() to make the data back in a readable form
     .toArray((err, items) => {
       // console.log("items:", items);
       res.send(`
@@ -68,17 +72,15 @@ app.get("/", (req, res) => {
         </div>
       </form>
     </div>
-    
+
     <ul id="item-list" class="list-group pb-5">
-      
     </ul>
-    
   </div>
 
   <script>
+  // The data that come from the server
   let items =${JSON.stringify(items)}
   </script>
-
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="/browser.js"></script>
 </body>
@@ -89,12 +91,14 @@ app.get("/", (req, res) => {
 
 // /create-item is from the <form> and 'item' in { text: req.body.item } is the 'name' of the input form
 app.post("/create-item", (req, res) => {
+  // We are mnot allow any html tag or attributes
   let safeText = sanitizeHTML(req.body.text, {
     allowTags: [],
     allowedAttributes: {}
   });
   db.collection("items").insertOne({ text: safeText }, (err, info) => {
-    res.json(info.ops[0]);
+    // Send back a JSO that represent the new mongodb object that has just been created
+    res.json(info.ops[0]); // the response.data int the browser.js file
   });
 });
 
